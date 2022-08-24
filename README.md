@@ -48,18 +48,21 @@ This namespace will probably be trashed as soon as nd4j 1.0.0 will come.
 
 ## Project inclusion
 
+(NOTE : the project is in devleopment and is not available for download as a package for now, you must build it locally)
+
 The project is currently in ALPHA, content works but is not complete
 
 ```clojure
-[clj-nd4j "0.1.0-SNAPSHOT"]
+[jeremylcfr/clj-nd4j "0.1.0-SNAPSHOT"]
 ```
 
 You can additionaly add target implementation from ND4J like :
 
 ```clojure
-[org.nd4j/nd4j-cuda-8.0 "1.0.0-beta6"]
+[org.nd4j/nd4j-cuda-11.6 "1.0.0-M2.1"]
 ```
-for CUDA (GPU), etc. See supported backends.
+for CUDA (GPU), etc. 
+See supported backends.
 
 ## Usage
 
@@ -271,13 +274,12 @@ Read code and DL4J (or incubated clj-dl4j) for more info.
 
 ## Dependencies
 
-As a basic low-level library, clj-nd4j has only ND4J related material and clj-numerics.
+As a basic low-level library, clj-nd4j has only ND4J related material and clj-java-commons.
 No dependencies should be included apart from clojure.core/Java lang/util/etc. ones.
 Small utilities must be copy-pasted/rewritten.
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018 Jérémy Le Corguillé
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Apache License 2.0
