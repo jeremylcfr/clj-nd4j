@@ -15,5 +15,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install dependencies
       run: lein deps
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run tests
       run: lein test

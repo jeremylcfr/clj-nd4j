@@ -9,7 +9,7 @@
                  [org.nd4j/nd4j-api "1.0.0-M2.1"]
                  [org.nd4j/nd4j-common "1.0.0-M2.1"]
                  [org.nd4j/nd4j-native "1.0.0-M2.1"]] 
-  :repositories [["github" {:url "https://maven.pkg.github.com/jeremylcfr/clj-java-commons"
+  :repositories [["github" {:url "https://maven.pkg.github.com"
                             :username "jeremylcfr" 
                             :password :env/GITHUB_TOKEN 
                             :sign-releases false}]]
