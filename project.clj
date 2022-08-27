@@ -9,10 +9,10 @@
                  [org.nd4j/nd4j-api "1.0.0-M2.1"]
                  [org.nd4j/nd4j-common "1.0.0-M2.1"]
                  [org.nd4j/nd4j-native "1.0.0-M2.1"]] 
-  :repositories [["github" {:url "https://maven.pkg.github.com/jeremylcfr/clj-java-commons"
+  :repositories [["github" {:url "https://maven.pkg.github.com/jeremylcfr/clj-nd4j"
                             :username "jeremylcfr" 
                             :password :env/GITHUB_TOKEN 
                             :sign-releases false}]]
-  :scm {:name "git" :url "https://github.com/jeremylcfr/clj-java-commons"}
+  :scm {:name "git" :url "https://github.com/jeremylcfr/clj-nd4j"}
   :profiles {:dev {:source-paths ["repl"]}}
   :repl-options {:init-ns repl})
