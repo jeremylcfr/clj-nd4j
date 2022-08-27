@@ -7,6 +7,9 @@ DL4J (ML) related material not to be used as standalone.
 As of the intended DL4J design, this wrapper will try to offer a
 pythonic flavour to make Java worth the shot.
 
+[![Clojars Project](https://img.shields.io/clojars/v/io.github.jeremylcfr/clj-nd4j.svg)](https://clojars.org/io.github.jeremylcfr/clj-nd4j)
+[![cljdoc badge](https://cljdoc.org/badge/io.github.jeremylcfr/clj-nd4j)](https://cljdoc.org/d/io.github.jeremylcfr/clj-nd4j)
+
 ## ND4J Overview
 
 ND4J is a performance-oriented library based on native code using JavaCPP as
