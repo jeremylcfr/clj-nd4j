@@ -13,5 +13,6 @@
                             :username "jeremylcfr" 
                             :password :env/GITHUB_TOKEN 
                             :sign-releases false}]]
+  :scm {:name "git" :url "https://github.com/jeremylcfr/clj-java-commons"}
   :profiles {:dev {:source-paths ["repl"]}}
   :repl-options {:init-ns repl})

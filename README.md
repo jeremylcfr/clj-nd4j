@@ -14,15 +14,15 @@ middleware. It also implements native BLAS libraries with the implementation you
 want (Intel MKL or OpenBlas).
 
 Obviously, this library is made for intensive programming and might be not worth the
-investment for small applications. Apache Commons Math (apache-maths) is enough in most cases.
+investment for small applications. Apache Commons Math, for instance, is enough in most cases.
 As a subset of DL4J, a java ML library,  this library would be also mandatory to build neural networks
 and other ML applications using core DL4J functions.
 
-See ND4J [official website](https://nd4j.org/index.html).
+See ND4J [official page](https://deeplearning4j.konduit.ai/nd4j/tutorials/quickstart).
 
 ## Design notes
 
-This library includes clj-numerics and so follows its naming conventions.
+This library includes clj-java-commons and so follows its naming conventions.
 It uses also its coercion policy.
 In short :
 - primitive 1D or 2D arrays are favored and are not rebuild contrary to the
@@ -48,9 +48,13 @@ This namespace will probably be trashed as soon as nd4j 1.0.0 will come.
 
 ## Project inclusion
 
-(NOTE : the project is in devleopment and is not available for download as a package for now, you must build it locally)
+The project is currently in ALPHA, content works but is not complete.
+Additionaly, this library was developped with a quite old ND4J version and 
+made compatible accross BREAKING changes. Thus, newer features were not implemented.
 
-The project is currently in ALPHA, content works but is not complete
+Finally, 0.X.Y versions will not be considered as real releases. Only 1.0.0 will start
+the series with a pretty confident design. Main namespaces will probably not break, 
+but it is not guaranteed. 
 
 ```clojure
 [jeremylcfr/clj-nd4j "0.1.0-SNAPSHOT"]
@@ -67,6 +71,22 @@ See supported backends.
 ## Usage
 
 Please find below a non-exhaustive documentation
+
+### Starting a repl
+
+A REPL namespaces is included under the `:dev` profile.
+So just `lein repl` at project root.
+
+Here is the current definition :
+
+```clojure
+(ns repl
+  (:require [clj-nd4j [ndarray :as nda]
+                      [dataset :as ndd]]
+            [clj-java-commons [core :refer :all]
+                              [coerce :refer [->clj]]])
+  (:refer-clojure :exclude [/ neg? pos?]))
+```
 
 ### Building nd-arrays
 
@@ -280,6 +300,6 @@ Small utilities must be copy-pasted/rewritten.
 
 ## License
 
-Copyright © 2018 Jérémy Le Corguillé
+Copyright © 2022 Jérémy Le Corguillé
 
 Apache License 2.0
