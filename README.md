@@ -62,7 +62,7 @@ the series with a pretty confident design. Main namespaces will probably not bre
 but it is not guaranteed. 
 
 ```clojure
-[jeremylcfr/clj-nd4j "0.1.0-SNAPSHOT"]
+[io.github.jeremylcfr/clj-nd4j "0.1.0-SNAPSHOT"]
 ```
 
 You can additionaly add target implementation from ND4J like :
