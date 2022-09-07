@@ -2,8 +2,10 @@
   (:require [clj-java-commons.core :refer :all]
             [clj-java-commons.coerce :refer [->clj]])
   (:import [org.nd4j.linalg.factory Nd4j]
+           [org.nd4j.linalg.api.buffer DataType]
            [org.nd4j.linalg.api.ndarray INDArray]
-           [org.nd4j.linalg.ops.transforms Transforms])
+           [org.nd4j.linalg.ops.transforms Transforms]
+           [org.nd4j.linalg.api.ops.impl.transforms Pad Pad$Mode])
   (:refer-clojure :exclude [/ pos? neg? abs]))
 
 ;; https://github.com/eclipse/deeplearning4j/blob/master/nd4j/nd4j-backends/nd4j-api-parent/nd4j-api/src/main/java/org/nd4j/linalg/factory/Nd4j.java#L3642
@@ -11,6 +13,23 @@
 
 
 ;; SELECTED TYPE
+
+(def ->data-type
+  {:double  DataType/DOUBLE
+   :float   DataType/FLOAT
+   :boolean DataType/BOOL
+   :string  DataType/UTF8
+   :int     DataType/INT32
+   :long    DataType/INT64})
+
+(def default-data-type DataType/DOUBLE)
+
+(def ->pad-mode
+  {:constant  Pad$Mode/CONSTANT
+   :reflect   Pad$Mode/REFLECT
+   :symmetric Pad$Mode/SYMMETRIC})
+
+(def default-pad-mode Pad$Mode/CONSTANT)
 
 ;;////////////////////////////////////////////////////////////////////////////
 ;;============================================================================
@@ -120,8 +139,10 @@
    input shape.
    Example :
    (nd-zeros [2 2]) ~ [[0 0] [0 0]]"
-  [shape]
-  (Nd4j/zeros (->long-array shape)))
+  ([shape]
+   (Nd4j/zeros (->long-array shape)))
+  ([data-type shape]
+   (Nd4j/zeros (->data-type data-type) (->long-array shape))))
 
 ;;=================Ones===============
 
@@ -130,8 +151,10 @@
    input shape.
    Example :
    (nd-ones [2 2]) ~ [[1 1] [1 1]]"
-  [shape]
-  (Nd4j/ones (->long-array shape)))
+  ([shape]
+   (Nd4j/ones (->long-array shape)))
+  ([data-type shape]
+   (Nd4j/ones (->data-type data-type) (->long-array shape))))
 
 ;;=================Rand===============
 
@@ -283,6 +306,24 @@
   [^INDArray a dimension]
   (Nd4j/argMin a ^ints (->int-array dimension)))
 
+(defn pad
+  ^INDArray
+  ([^INDArray a width]
+   (Nd4j/pad a (->iint-array width)))
+  ([^INDArray a width value]
+   (pad a width :constant value))
+  ([^INDArray a width mode value]
+   (Nd4j/pad a (->iint-array width) (->pad-mode mode) (double value))))
+   
+(defn append
+  ^INDArray
+  [^INDArray a width value axis]
+  (Nd4j/append a (int width) (double value) (int axis)))
+
+(defn prepend
+  ^INDArray
+  [^INDArray a width value axis]
+  (Nd4j/prepend a (int width) (double value) (int axis)))
 
 ;;=======================================================
 ;;=======================FUNCTIONS=======================
