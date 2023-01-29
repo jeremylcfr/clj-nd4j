@@ -12,6 +12,10 @@ pythonic flavour to make Java worth the shot.
 [![cljdoc badge](https://cljdoc.org/badge/io.github.jeremylcfr/clj-nd4j)](https://cljdoc.org/d/io.github.jeremylcfr/clj-nd4j)
 -->
 
+## Development notes
+
+This library is under development but the branch master is considered more "stable" than the "devel" one because the additions are written while discovering ND4j and playing with it. Thus, refactoring is very likely to happen. Master work however is considered as "mastered". Of course changes mighht happen because of ND4j development, but the overall design and most functions will probably remain the same. Thus only master branch is available on clojars.
+
 ## ND4J Overview
 
 ND4J is a performance-oriented library based on native code using JavaCPP as
