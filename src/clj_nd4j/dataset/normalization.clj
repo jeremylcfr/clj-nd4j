@@ -1,8 +1,9 @@
 (ns clj-nd4j.dataset.normalization
   (:require [clj-nd4j.ndarray :as nd4j])
   (:import [org.nd4j.linalg.dataset.api.preprocessor Normalizer AbstractDataSetNormalizer NormalizerMinMaxScaler]
-           [org.nd4j.linalg.dataset.api.iterator DataSetIterator]
-           [org.nd4j.linalg.api.ndarray INDArray]))
+           [org.nd4j.linalg.api.ndarray INDArray]
+           [org.nd4j.linalg.dataset.api DataSet]
+           [org.nd4j.linalg.dataset.api.iterator DataSetIterator]))
 
 (def normalizer-options-paths
   {:min-max-scaler [:dataset]})
@@ -46,18 +47,20 @@
    (normalizer-min-max-scaler {:min-range min-range , :max-range max-range} options)))
 
 ;; see later if it is the best granularity
- (defn dataset-normalizer?
-   [obj]
-   (instance? AbstractDataSetNormalizer obj))
+(defn dataset-normalizer?
+  [obj]
+  (instance? AbstractDataSetNormalizer obj))
+
+;; Add with iterator
 
 (defn fit-dataset!
-  [^AbstractDataSetNormalizer normalizer ^DataSetIterator iterator]
-  (.fit normalizer iterator))
+  [^AbstractDataSetNormalizer normalizer ^DataSet dataset]
+  (.fit normalizer dataset))
 
 (defn fit-dataset
   ^AbstractDataSetNormalizer
-  [^AbstractDataSetNormalizer normalizer iterator]
-  (fit-dataset! normalizer iterator)
+  [^AbstractDataSetNormalizer normalizer dataset]
+  (fit-dataset! normalizer dataset)
   normalizer)
  
  (defn qualify-normalizer
@@ -69,21 +72,69 @@
  
  
  (defn fit!
-   ([normalizer iterator]
-    (fit! (qualify-normalizer normalizer) normalizer iterator))
-   ([type-fn normalizer iterator]
+   ([normalizer dataset]
+    (fit! (qualify-normalizer normalizer) normalizer dataset))
+   ([type-fn normalizer dataset]
     (let [fitter (get-in fitters [type-fn :void])]
-      (fitter normalizer iterator))))
+      (fitter normalizer dataset))))
 
  (defn fit
    ^Normalizer
-   ([normalizer iterator]
-    (fit! normalizer iterator)
+   ([normalizer dataset]
+    (fit! normalizer dataset)
     normalizer)
-   ([type-fn normalizer iterator]
-    (fit! type-fn normalizer iterator)
+   ([type-fn normalizer dataset]
+    (fit! type-fn normalizer dataset)
     normalizer))
+
+ (defn transform!
+   [^AbstractDataSetNormalizer normalizer ^DataSet obj]
+   (.transform normalizer obj))
  
- ;; next : transform and pre-process
-  
-   
+ (defn transform
+   ^DataSet
+   [normalizer obj]
+   (transform! normalizer obj)
+    obj)
+ 
+;; labels and features
+ 
+ (defn revert!
+   [^AbstractDataSetNormalizer normalizer ^DataSet dataset]
+   (.revert normalizer dataset))
+ 
+ (defn revert
+   ^DataSet
+   [normalizer dataset]
+   (revert! normalizer dataset)
+   dataset)
+ 
+ (defn revert-features!
+   ([^AbstractDataSetNormalizer normalizer ^INDArray features]
+    (.revertFeatures normalizer features))
+   ([^AbstractDataSetNormalizer normalizer ^INDArray features ^INDArray features-mask]
+    (.revertFeatures normalizer features features-mask)))
+ 
+ (defn revert-features
+   ^INDArray
+   ([normalizer features]
+    (revert-features! normalizer features)
+    features)
+   ([normalizer features features-mask]
+    (revert-features! normalizer features features-mask)
+    features))
+
+(defn revert-labels!
+  ([^AbstractDataSetNormalizer normalizer ^INDArray labels]
+   (.revertLabels normalizer labels))
+  ([^AbstractDataSetNormalizer normalizer ^INDArray labels ^INDArray labels-mask]
+   (.revertLabels normalizer labels labels-mask)))
+
+(defn revert-labels
+  ^INDArray
+  ([normalizer labels]
+   (revert-labels! normalizer labels)
+   labels)
+  ([normalizer labels labels-mask]
+   (revert-labels! normalizer labels labels-mask)
+   labels))
