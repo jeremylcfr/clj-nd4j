@@ -3,6 +3,7 @@
                       [dataset :as ndd]]
             [clj-nd4j.dataset [normalization :as norm]]
             [clj-nd4j.ml [activation :as mlactiv]
+                         [evaluation :as mleval]
                          [gradient :as mlgrad]
                          [learning :as mlearn]
                          [loss :as mloss]]
