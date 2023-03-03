@@ -1,5 +1,8 @@
 (ns clj-nd4j.ml.gradient
-  (:import [org.nd4j.linalg.learning AdaDeltaUpdater AMSGradUpdater AdaGradUpdater AdaMaxUpdater AdamUpdater NadamUpdater NesterovsUpdater RmsPropUpdater SgdUpdater]
+  (:require [clj-nd4j.ndarray :as nda]
+            [clojure.algo.generic.functor :refer [fmap]]
+            [clj-java-commons [core :refer :all]])
+  (:import [org.nd4j.linalg.learning GradientUpdater AdaDeltaUpdater AMSGradUpdater AdaGradUpdater AdaMaxUpdater AdamUpdater NadamUpdater NesterovsUpdater RmsPropUpdater SgdUpdater]
            [org.nd4j.linalg.learning.config IUpdater AMSGrad AdaDelta AdaGrad AdaMax Adam Nadam Nesterovs RmsProp Sgd]))
 
 ;;////////////////////////////////////////////////////////////////////////////
@@ -100,9 +103,9 @@
 
 (def gradient-update-configs
   {:ams-grad    ->ams-grad-config
-   :adadelta   ->ada-delta-config
-   :adagrad    ->ada-grad-config
-   :adamax     ->ada-max-config
+   :adadelta    ->ada-delta-config
+   :adagrad     ->ada-grad-config
+   :adamax      ->ada-max-config
    :adam        ->adam-config
    :nadam       ->nadam-config
    :nesterovs   ->nesterovs-config
@@ -207,8 +210,10 @@
 ;; Not required to design simple neural networks
 
 ;;======================================================
-;;=======================AMS GRAD=======================
+;;=======================SPECIFIC=======================
 ;;======================================================
+
+;;=================AMS grad===============
 
 (defn ams-grad-updater
   ^AMSGradUpdater
@@ -223,9 +228,7 @@
       obj
       (->ams-grad-config obj))))
 
-;;=======================================================
-;;=======================ADA DELTA=======================
-;;=======================================================
+;;=================Ada delta===============
 
 (defn ada-delta-updater
   ^AdaDeltaUpdater
@@ -240,9 +243,7 @@
       obj
       (->ada-delta-config obj))))
 
-;;======================================================
-;;=======================ADA GRAD=======================
-;;======================================================
+;;=================Ada grad===============
 
 (defn ada-grad-updater
   ^AdaGradUpdater
@@ -257,9 +258,7 @@
       obj
       (->ada-grad-config obj))))
 
-;;=====================================================
-;;=======================ADA MAX=======================
-;;=====================================================
+;;=================Ada max===============
 
 (defn ada-max-updater
   ^AdaMaxUpdater
@@ -274,9 +273,7 @@
       obj
       (->ada-max-config obj))))
 
-;;==================================================
-;;=======================ADAM=======================
-;;==================================================
+;;=================Adam===============
 
 (defn adam-updater
   ^AdamUpdater
@@ -291,9 +288,7 @@
       obj
       (->adam-config obj))))
 
-;;===================================================
-;;=======================NADAM=======================
-;;===================================================
+;;=================Nadam===============
 
 (defn nadam-updater
   ^NadamUpdater
@@ -308,9 +303,7 @@
       obj
       (->nadam-config obj))))
 
-;;=======================================================
-;;=======================NESTEROVS=======================
-;;=======================================================
+;;=================Nesterovs===============
 
 (defn nesterovs-updater
   ^NesterovsUpdater
@@ -325,9 +318,7 @@
       obj
       (->nesterovs-config obj))))
 
-;;======================================================
-;;=======================RMS PROP=======================
-;;======================================================
+;;=================Rms prop===============
 
 (defn rms-prop-updater
   ^RmsPropUpdater
@@ -342,9 +333,7 @@
       obj
       (->rms-prop-config obj))))
 
-;;=================================================
-;;=======================SGD=======================
-;;=================================================
+;;=================Sgd===============
 
 (defn sgd-updater
   ^SgdUpdater
@@ -359,5 +348,72 @@
       obj
       (->sgd-config obj))))
 
+;;==================================================
+;;=======================META=======================
+;;==================================================
 
+(def gradient-updaters
+  {:ams-grad    ->ams-grad-updater
+   :adadelta    ->ada-delta-updater
+   :adagrad     ->ada-grad-updater
+   :adamax      ->ada-max-updater
+   :adam        ->adam-updater
+   :nadam       ->nadam-updater
+   :nesterovs   ->nesterovs-updater
+   :rms-prop    ->rms-prop-updater
+   :sgd         ->sgd-updater})
+
+;;======================================================
+;;=======================BUILDERS=======================
+;;======================================================
+
+;;=================Built-in===============
+
+(defn ->gradient-updater
+  ^GradientUpdater
+  ([{:keys [type] :as options}]
+   (->gradient-updater type options))
+  ([type options]
+   (if-let [builder (get gradient-updaters type)]
+     (builder options)
+     (throw (Exception. (str "GRADIENT UPDATER - Unknown type : " type))))))
+
+
+;;=====================================================
+;;=======================METHODS=======================
+;;=====================================================
+
+;;=================Config===============
+
+(defn get-config
+  ^IUpdater
+  [^GradientUpdater obj]
+  (.getConfig obj))
+
+;;=================State===============
+
+(defn get-state
+  ^Map
+  [^GradientUpdater obj]
+  (.getState obj))
+
+(defn set-state!
+  [^GradientUpdater obj ^Map state-map initialize?]
+  (.setState obj ^Map (fmap nda/->nd-array state-map) ^boolean (boolean initialize?)))
+
+(defn set-state-view-array!
+  [^GradientUpdater obj gradient-shape gradient-order initialize?]
+  (.setStateViewArray obj (->long-array gradient-shape) (char gradient-order) ^boolean (boolean initialize?)))
+
+;;=================Apply===============
+
+(defn apply-updater!
+  [^GradientUpdater obj gradient iteration epoch]
+  (.applyUpdater obj (nda/->nd-array gradient) ^int (int iteration) ^int (int epoch)))
+
+(defn apply-updater
+  ^GradientUpdater
+  [obj gradient iteration epoch]
+  (apply-updater! obj gradient iteration epoch)
+  obj)
 

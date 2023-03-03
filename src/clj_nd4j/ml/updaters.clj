@@ -11,11 +11,11 @@
 (defn ->nesterovs-config
   ^Nesterovs
   ([options]
-   (->nesterovs-config 
+   (->nesterovs-config
     {:learning-rate Nesterovs/DEFAULT_NESTEROV_LEARNING_RATE
      :momentum Nesterovs/DEFAULT_NESTEROV_MOMENTUM} options))
   ([defaults options]
-   (let [{:keys [learning-rate momentum 
+   (let [{:keys [learning-rate momentum
                  learning-rate-schedule
                  momentum-schedule]} (merge defaults options)]
      (cond (and learning-rate-schedule momentum-schedule)
@@ -31,7 +31,7 @@
 (def updaters-config
   {:nesterovs {:builder ->nesterovs-config
                :defaults {:learning-rate Nesterovs/DEFAULT_NESTEROV_LEARNING_RATE
-                          :momentum Nesterovs/DEFAULT_NESTEROV_MOMENTUM}}})
+                          :momentum      Nesterovs/DEFAULT_NESTEROV_MOMENTUM}}})
 
 (defn ->updater-config
   ^IUpdater
@@ -40,6 +40,14 @@
   ([type-fn options]
    (let [{:keys [builder defaults]} (get updaters-config type-fn)]
      (builder defaults options))))
+
+
+
+
+
+
+
+
 
 (defn iupdater?
   [obj]
@@ -63,16 +71,25 @@
    (let [builder (get updaters type-fn)]
      (builder (->updater-config type-fn config)))))
 
+
+
+
+
+
+
+
+
+
 (defn get-config
   ^IUpdater
   [^GradientUpdater obj]
   (.getConfig obj))
-    
+
 (defn get-state
   ^Map
   [^GradientUpdater obj]
   (.getState obj))
-    
+
 (defn set-state!
   [^GradientUpdater obj ^Map state-map initialize?]
   (.setState obj ^Map (fmap nda/->nd-array state-map) ^boolean (boolean initialize?)))
@@ -84,9 +101,15 @@
 (defn apply-updater!
   [^GradientUpdater obj gradient iteration epoch]
   (.applyUpdater obj (nda/->nd-array gradient) ^int (int iteration) ^int (int epoch)))
-    
 
-    
+(defn apply-updater
+  ^GradientUpdater
+  [obj gradient iteration epoch]
+  (apply-updater! obj gradient iteration epoch)
+  obj)
 
-  
+
+
+
+
 

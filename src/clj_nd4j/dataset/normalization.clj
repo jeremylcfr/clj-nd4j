@@ -1,12 +1,14 @@
 (ns clj-nd4j.dataset.normalization
   (:require [clj-nd4j.ndarray :as nd4j])
   (:import [org.nd4j.linalg.dataset.api.preprocessor Normalizer AbstractDataSetNormalizer NormalizerMinMaxScaler]
+           [org.nd4j.linalg.dataset.api.preprocessor.stats DistributionStats]
            [org.nd4j.linalg.api.ndarray INDArray]
            [org.nd4j.linalg.dataset.api DataSet]
            [org.nd4j.linalg.dataset.api.iterator DataSetIterator]))
 
 (def normalizer-options-paths
-  {:min-max-scaler [:dataset]})
+  {:min-max-scaler [:dataset]
+   :standardizer   [:dataset]})
 
 (defmulti apply-normalizer-options*
   (fn [normalizer-fn _ _] normalizer-fn))
@@ -24,7 +26,16 @@
   (when (or feature-min feature-max)
     (.setFeatureStats ^NormalizerMinMaxScaler normalizer ^INDArray (nd4j/->nd-array feature-min) ^INDArray (nd4j/->nd-array feature-max)))
   (when (or label-min label-max)
-    (.setLabelStats   ^INDArray (nd4j/->nd-array label-min)   ^INDArray (nd4j/->nd-array label-max))))
+    (.setLabelStats ^NormalizerMinMaxScaler normalizer ^INDArray (nd4j/->nd-array label-min)   ^INDArray (nd4j/->nd-array label-max))))
+
+(defmethod apply-normalizer-options* :standardizer
+  [_ {:keys [feature-mean feature-std label-mean label-std]} ^NormalizerStandardize normalizer]
+  ;; doto-cond, see where to use it
+  ;; see how to handle XOR case (incorrect) ==> clojure.spec ?
+  (when (or feature-mean feature-std)
+    (.setFeatureStats ^NormalizerStandardize normalizer (DistributionStats. ^INDArray (nd4j/->nd-array feature-mean) ^INDArray (nd4j/->nd-array feature-std))))
+  (when (or label-mean label-std)
+    (.setLabelStats ^NormalizerStandardize normalizer  ^INDArray (nd4j/->nd-array label-mean)   ^INDArray (nd4j/->nd-array label-std))))
 
 (def apply-normalizer-options apply-normalizer-options*)
 
@@ -36,6 +47,8 @@
     normalizer))
 
 
+
+;; Not consistent, see later
 (defn normalizer-min-max-scaler
   ^NormalizerMinMaxScaler
   ([{:keys [min-range max-range] :or {min-range 0.0 , max-range 1.0}}]
@@ -45,6 +58,17 @@
      (apply-normalizer-options-stack :min-max-scaler options normalizer)))
   ([options min-range max-range]
    (normalizer-min-max-scaler {:min-range min-range , :max-range max-range} options)))
+
+(defn normalizer-standardizer
+  ^NormalizerStandardize
+  ([]
+   (NormalizerStandardize.))
+  ([options]
+   (let [normalizer (normalizer-standardizer)]
+     (apply-normalizer-options-stack :standardizer options normalizer))))
+
+
+
 
 ;; see later if it is the best granularity
 (defn dataset-normalizer?
@@ -62,15 +86,15 @@
   [^AbstractDataSetNormalizer normalizer dataset]
   (fit-dataset! normalizer dataset)
   normalizer)
- 
+
  (defn qualify-normalizer
    [normalizer]
    (cond (dataset-normalizer? normalizer) :single))
- 
+
  (def fitters
    {:single {:void fit-dataset! , :self fit-dataset}})
- 
- 
+
+
  (defn fit!
    ([normalizer dataset]
     (fit! (qualify-normalizer normalizer) normalizer dataset))
@@ -90,31 +114,31 @@
  (defn transform!
    [^AbstractDataSetNormalizer normalizer ^DataSet obj]
    (.transform normalizer obj))
- 
+
  (defn transform
    ^DataSet
    [normalizer obj]
    (transform! normalizer obj)
     obj)
- 
+
 ;; labels and features
- 
+
  (defn revert!
    [^AbstractDataSetNormalizer normalizer ^DataSet dataset]
    (.revert normalizer dataset))
- 
+
  (defn revert
    ^DataSet
    [normalizer dataset]
    (revert! normalizer dataset)
    dataset)
- 
+
  (defn revert-features!
    ([^AbstractDataSetNormalizer normalizer ^INDArray features]
     (.revertFeatures normalizer features))
    ([^AbstractDataSetNormalizer normalizer ^INDArray features ^INDArray features-mask]
     (.revertFeatures normalizer features features-mask)))
- 
+
  (defn revert-features
    ^INDArray
    ([normalizer features]
