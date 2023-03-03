@@ -3,7 +3,9 @@
             [clojure.algo.generic.functor :refer [fmap]]
             [clj-java-commons [core :refer :all]])
   (:import [org.nd4j.linalg.learning GradientUpdater AdaDeltaUpdater AMSGradUpdater AdaGradUpdater AdaMaxUpdater AdamUpdater NadamUpdater NesterovsUpdater RmsPropUpdater SgdUpdater]
-           [org.nd4j.linalg.learning.config IUpdater AMSGrad AdaDelta AdaGrad AdaMax Adam Nadam Nesterovs RmsProp Sgd]))
+           [org.nd4j.linalg.learning.config IUpdater AMSGrad AdaDelta AdaGrad AdaMax Adam Nadam Nesterovs RmsProp Sgd]
+           [java.util Map])
+  (:refer-clojure :exclude [/ pos? neg?]))
 
 ;;////////////////////////////////////////////////////////////////////////////
 ;;============================================================================

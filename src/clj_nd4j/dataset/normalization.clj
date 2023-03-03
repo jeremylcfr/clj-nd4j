@@ -1,6 +1,6 @@
 (ns clj-nd4j.dataset.normalization
   (:require [clj-nd4j.ndarray :as nd4j])
-  (:import [org.nd4j.linalg.dataset.api.preprocessor Normalizer AbstractDataSetNormalizer NormalizerMinMaxScaler]
+  (:import [org.nd4j.linalg.dataset.api.preprocessor Normalizer AbstractDataSetNormalizer NormalizerMinMaxScaler NormalizerStandardize]
            [org.nd4j.linalg.dataset.api.preprocessor.stats DistributionStats]
            [org.nd4j.linalg.api.ndarray INDArray]
            [org.nd4j.linalg.dataset.api DataSet]
