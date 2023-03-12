@@ -1,23 +1,25 @@
 (ns clj-nd4j.ml.evaluation
   (:require [clj-nd4j.ndarray :as nda])
   (:import [org.nd4j.evaluation IEvaluation]
-           [org.nd4j.evaluation.regression Evaluation RegressionEvaluation]
+           [org.nd4j.evaluation.classification Evaluation]
+           [org.nd4j.evaluation.regression RegressionEvaluation]
            [org.nd4j.linalg.api.ndarray INDArray]
-           [java.util List])
+           [java.util List Map])
   (:refer-clojure :exclude [merge reset!]))
 
- public Evaluation ()
+ 
+;;  public Evaluation ()
 
- public Evaluation (int numClasses)
- public Evaluation (List<String> labels)
- public Evaluation (Map<Integer, String> labels)
- public Evaluation (double binaryDecisionThreshold)
- public Evaluation (INDArray costArray)
+;;  public Evaluation (int numClasses)
+;;  public Evaluation (List<String> labels)
+;;  public Evaluation (Map<Integer, String> labels)
+;;  public Evaluation (double binaryDecisionThreshold)
+;;  public Evaluation (INDArray costArray)
 
- public Evaluation (int numClasses, Integer binaryPositiveClass)
- public Evaluation (List<String> labels, int topN)
- public Evaluation (double binaryDecisionThreshold, @NonNull Integer binaryPositiveClass)
- public Evaluation (List<String> labels, INDArray costArray)
+;;  public Evaluation (int numClasses, Integer binaryPositiveClass)
+;;  public Evaluation (List<String> labels, int topN)
+;;  public Evaluation (double binaryDecisionThreshold, @NonNull Integer binaryPositiveClass)
+;;  public Evaluation (List<String> labels, INDArray costArray)
 
  ;; Use clojure.spec ...
  (defn evaluation
@@ -29,10 +31,10 @@
             (if (or labels binary-decision-thresold cost-array)
               (throw (Exception. "Evaluation cannot be built with num-classes and provided argments"))
               (if binary-positive-class 
-                (Evaluation. ^int (int num-classes) ^Integer binary-positive-class)
+                (Evaluation. ^int (int num-classes) ^Integer (Integer. ^int (int binary-positive-class)))
                 (Evaluation. ^int (int num-classes))))
           labels
-            (if (or (or num-classes binary-decision-thresold) (and top-n cost-array))
+            (if (or binary-decision-thresold (and top-n cost-array))
               (throw (Exception. "Evaluation cannot be built with labels and provided argments"))
               (cond top-n
                       (Evaluation. ^List (seq labels) ^int (int top-n))
@@ -42,9 +44,18 @@
                       (Evaluation. ^Map labels)
                     :else
                       (Evaluation. ^List (seq labels))))
-          ;; continuer
-    )))
-                      
+          binary-decision-thresold
+            (if cost-array
+              (throw (Exception. "Evaluation cannot be built with labels and provided argments"))
+              (cond binary-positive-class
+                      (Evaluation. ^double binary-decision-thresold ^Integer (Integer. ^int (int binary-positive-class)))
+                    :else
+                      (Evaluation. ^double binary-decision-thresold)))
+          cost-array
+            (Evaluation. ^INDArray (nda/->nd-array cost-array))
+          :else
+            (throw (Exception. "Evaluation cannot be built with labels and provided argments")))))
+
 
 (defn regression-evaluation
   ^RegressionEvaluation
